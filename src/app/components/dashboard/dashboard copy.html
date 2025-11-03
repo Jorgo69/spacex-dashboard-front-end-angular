@@ -1,0 +1,162 @@
+<div *ngIf="loading" class="text-center py-10">
+  <p>Chargement des données...</p>
+</div>
+
+<div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error">
+
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h2 class="text-lg font-semibold mb-4">Launches per Year</h2>
+      <canvas
+        baseChart
+        [data]="barChartData"
+        [options]="barChartOptions"
+        [type]="'bar'">
+      </canvas>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h2 class="text-lg font-semibold mb-4">Success Rate per Year</h2>
+      <canvas
+        baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="'line'">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h3 class="text-gray-500 text-sm">Total Launches</h3>
+      <p class="text-2xl font-bold">{{ kpi?.total_launches }}</p>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h3 class="text-gray-500 text-sm">Success Rate</h3>
+      <p class="text-2xl font-bold text-green-600">{{ kpi?.success_rate }}%</p>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg shadow" *ngIf="kpi?.next_launch">
+      <h3 class="text-gray-500 text-sm">Next Launch</h3>
+      <p class="font-semibold">{{ kpi.next_launch.name }}</p>
+      <p class="text-sm text-gray-600">
+        {{ kpi.next_launch.days_until > 0 ? 'In ' + kpi.next_launch.days_until + ' days' : 'Today' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats par année -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Stats by Year</h2>
+    <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-gray-600">
+            <th>Year</th>
+            <th>Total</th>
+            <th>Success Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stat of statsByYear" class="border-t">
+            <td>{{ stat.year }}</td>
+            <td>{{ stat.total }}</td>
+            <td>{{ stat.success_rate }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Liste des lancements -->
+  <div>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold">Recent Launches</h2>
+      <button
+        *ngIf="userRole === 'admin'"
+        (click)="onResync()"
+        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+      >
+        Resynchroniser
+      </button>
+    </div>
+
+    <!-- Filtres -->
+    <div class="flex gap-3 mb-4 flex-wrap">
+      <input
+        type="text"
+        [(ngModel)]="filters.search"
+        (ngModelChange)="applyFilters()"
+        placeholder="Rechercher..."
+        class="border rounded px-3 py-1 text-sm w-full md:w-1/3"
+      />
+
+      <select [(ngModel)]="filters.year" (ngModelChange)="applyFilters()" class="border rounded px-2 py-1 text-sm">
+        <option value="">All years</option>
+        <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+      </select>
+
+      <select [(ngModel)]="filters.success" (ngModelChange)="applyFilters()" class="border rounded px-2 py-1 text-sm">
+        <option value="">All</option>
+        <option value="true">Success</option>
+        <option value="false">Failure</option>
+      </select>
+    </div>
+
+    <!-- Liste paginée -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div *ngFor="let launch of launches" class="border-b last:border-0 p-4 hover:bg-gray-50">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-medium">{{ launch.name }}</h3>
+            <p class="text-sm text-gray-500">{{ launch.date_utc | date:'medium' }}</p>
+            <p class="mt-1 text-sm text-gray-700">{{ launch.details || 'No details available' }}</p>
+          </div>
+
+          <div class="flex flex-col items-end gap-2">
+            <span
+              class="px-2 py-1 text-xs rounded"
+              [ngClass]="{
+                'bg-green-100 text-green-800': launch.success !== false,
+                'bg-red-100 text-red-800': launch.success === false
+              }"
+            >
+              {{ launch.success === false ? 'Failure' : 'Success' }}
+            </span>
+
+            <div class="flex gap-2 text-sm">
+              <a *ngIf="launch.links.webcast" [href]="launch.links.webcast" target="_blank" class="text-blue-600 hover:underline">YouTube</a>
+              <a *ngIf="launch.links.article" [href]="launch.links.article" target="_blank" class="text-gray-600 hover:underline">Article</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-between items-center mt-4">
+      <button
+        (click)="prevPage()"
+        [disabled]="currentPage === 1"
+        class="px-3 py-1 bg-gray-200 text-sm rounded disabled:opacity-50"
+      >
+        ← Previous
+      </button>
+      <span class="text-sm">Page {{ currentPage }} / {{ totalPages }}</span>
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        class="px-3 py-1 bg-gray-200 text-sm rounded disabled:opacity-50"
+      >
+        Next →
+      </button>
+    </div>
+  </div>
+</div>

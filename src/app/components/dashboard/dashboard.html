@@ -1,74 +1,140 @@
-<div *ngIf="loading" class="text-center py-10">
-  <p>Chargement des données...</p>
+<div *ngIf="loading" class="flex justify-center items-center py-20">
+  <div class="text-center">
+    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+    <p class="text-gray-600">Chargement des données...</p>
+  </div>
 </div>
 
-<div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-  {{ error }}
+<div *ngIf="error" class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6">
+  <div class="flex items-center">
+    <div class="flex-shrink-0">
+      <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+    </div>
+    <div class="ml-3">
+      <p class="text-sm text-red-700">{{ error }}</p>
+    </div>
+  </div>
 </div>
 
-<div *ngIf="!loading && !error">
+<div *ngIf="!loading && !error" class="space-y-8">
 
-  <!-- Graphiques -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h2 class="text-lg font-semibold mb-4">Launches per Year</h2>
-      <canvas
-        baseChart
-        [data]="barChartData"
-        [options]="barChartOptions"
-        [type]="'bar'">
-      </canvas>
+  <!-- KPIs -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-gray-500 text-sm font-medium">Total Launches</h3>
+          <p class="text-2xl font-bold text-gray-900">{{ kpi?.total_launches }}</p>
+        </div>
+      </div>
     </div>
 
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h2 class="text-lg font-semibold mb-4">Success Rate per Year</h2>
-      <canvas
-        baseChart
-        [data]="lineChartData"
-        [options]="lineChartOptions"
-        [type]="'line'">
-      </canvas>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-gray-500 text-sm font-medium">Success Rate</h3>
+          <p class="text-2xl font-bold text-green-600">{{ kpi?.success_rate }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100" *ngIf="kpi?.next_launch">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-gray-500 text-sm font-medium">Next Launch</h3>
+          <p class="font-semibold text-gray-900">{{ kpi.next_launch.name }}</p>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ kpi.next_launch.days_until > 0 ? 'In ' + kpi.next_launch.days_until + ' days' : 'Today' }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- KPIs -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h3 class="text-gray-500 text-sm">Total Launches</h3>
-      <p class="text-2xl font-bold">{{ kpi?.total_launches }}</p>
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-900">Launches per Year</h2>
+        <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+      </div>
+      <div class="h-80">
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
     </div>
 
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h3 class="text-gray-500 text-sm">Success Rate</h3>
-      <p class="text-2xl font-bold text-green-600">{{ kpi?.success_rate }}%</p>
-    </div>
-
-    <div class="bg-white p-4 rounded-lg shadow" *ngIf="kpi?.next_launch">
-      <h3 class="text-gray-500 text-sm">Next Launch</h3>
-      <p class="font-semibold">{{ kpi.next_launch.name }}</p>
-      <p class="text-sm text-gray-600">
-        {{ kpi.next_launch.days_until > 0 ? 'In ' + kpi.next_launch.days_until + ' days' : 'Today' }}
-      </p>
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-900">Success Rate per Year</h2>
+        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+      </div>
+      <div class="h-80">
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
     </div>
   </div>
 
   <!-- Stats par année -->
-  <div class="mb-8">
-    <h2 class="text-xl font-semibold mb-4">Stats by Year</h2>
-    <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
-      <table class="w-full text-sm">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900">Stats by Year</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
         <thead>
-          <tr class="text-left text-gray-600">
-            <th>Year</th>
-            <th>Total</th>
-            <th>Success Rate</th>
+          <tr class="bg-gray-50">
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Launches</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Success Rate</th>
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let stat of statsByYear" class="border-t">
-            <td>{{ stat.year }}</td>
-            <td>{{ stat.total }}</td>
-            <td>{{ stat.success_rate }}%</td>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let stat of statsByYear" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ stat.year }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ stat.total }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': stat.success_rate >= 90,
+                  'bg-yellow-100 text-yellow-800': stat.success_rate >= 70 && stat.success_rate < 90,
+                  'bg-red-100 text-red-800': stat.success_rate < 70
+                }">
+                {{ stat.success_rate }}%
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -76,64 +142,112 @@
   </div>
 
   <!-- Liste des lancements -->
-  <div>
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold">Recent Launches</h2>
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h2 class="text-xl font-semibold text-gray-900">Recent Launches</h2>
       <button
         *ngIf="userRole === 'admin'"
         (click)="onResync()"
-        class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-sm"
       >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
         Resynchroniser
       </button>
     </div>
 
     <!-- Filtres -->
-    <div class="flex gap-3 mb-4 flex-wrap">
-      <input
-        type="text"
-        [(ngModel)]="filters.search"
-        (ngModelChange)="applyFilters()"
-        placeholder="Rechercher..."
-        class="border rounded px-3 py-1 text-sm w-full md:w-1/3"
-      />
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-1">
+          <input
+            type="text"
+            [(ngModel)]="filters.search"
+            (ngModelChange)="applyFilters()"
+            placeholder="Rechercher un lancement..."
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+        
+        <select 
+          [(ngModel)]="filters.year" 
+          (ngModelChange)="applyFilters()" 
+          class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        >
+          <option value="">Toutes les années</option>
+          <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+        </select>
 
-      <select [(ngModel)]="filters.year" (ngModelChange)="applyFilters()" class="border rounded px-2 py-1 text-sm">
-        <option value="">All years</option>
-        <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
-      </select>
-
-      <select [(ngModel)]="filters.success" (ngModelChange)="applyFilters()" class="border rounded px-2 py-1 text-sm">
-        <option value="">All</option>
-        <option value="true">Success</option>
-        <option value="false">Failure</option>
-      </select>
+        <select 
+          [(ngModel)]="filters.success" 
+          (ngModelChange)="applyFilters()" 
+          class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        >
+          <option value="">Tous les statuts</option>
+          <option value="true">Succès</option>
+          <option value="false">Échec</option>
+        </select>
+      </div>
     </div>
 
     <!-- Liste paginée -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <div *ngFor="let launch of launches" class="border-b last:border-0 p-4 hover:bg-gray-50">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="font-medium">{{ launch.name }}</h3>
-            <p class="text-sm text-gray-500">{{ launch.date_utc | date:'medium' }}</p>
-            <p class="mt-1 text-sm text-gray-700">{{ launch.details || 'No details available' }}</p>
-          </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="divide-y divide-gray-100">
+        <div *ngFor="let launch of launches" class="p-6 hover:bg-gray-50 transition-colors">
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 mt-1">
+                  <div class="w-3 h-3 rounded-full"
+                    [ngClass]="{
+                      'bg-green-500': launch.success !== false,
+                      'bg-red-500': launch.success === false
+                    }">
+                  </div>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 text-lg">{{ launch.name }}</h3>
+                  <p class="text-sm text-gray-500 mt-1">{{ launch.date_utc | date:'medium' }}</p>
+                  <p class="mt-2 text-gray-700 leading-relaxed">
+                    {{ launch.details || 'Aucun détail disponible' }}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          <div class="flex flex-col items-end gap-2">
-            <span
-              class="px-2 py-1 text-xs rounded"
-              [ngClass]="{
-                'bg-green-100 text-green-800': launch.success !== false,
-                'bg-red-100 text-red-800': launch.success === false
-              }"
-            >
-              {{ launch.success === false ? 'Failure' : 'Success' }}
-            </span>
+            <div class="flex flex-col items-start lg:items-end gap-3">
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': launch.success !== false,
+                  'bg-red-100 text-red-800': launch.success === false
+                }"
+              >
+                {{ launch.success === false ? 'Échec' : 'Succès' }}
+              </span>
 
-            <div class="flex gap-2 text-sm">
-              <a *ngIf="launch.links.webcast" [href]="launch.links.webcast" target="_blank" class="text-blue-600 hover:underline">YouTube</a>
-              <a *ngIf="launch.links.article" [href]="launch.links.article" target="_blank" class="text-gray-600 hover:underline">Article</a>
+              <div class="flex gap-3">
+                <a *ngIf="launch.links.webcast" 
+                   [href]="launch.links.webcast" 
+                   target="_blank" 
+                   class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                  <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+                    <path d="M10 6l6 4-6 4V6z"/>
+                  </svg>
+                  YouTube
+                </a>
+                <a *ngIf="launch.links.article" 
+                   [href]="launch.links.article" 
+                   target="_blank" 
+                   class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9m0 0v12"/>
+                  </svg>
+                  Article
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -141,22 +255,32 @@
     </div>
 
     <!-- Pagination -->
-    <div class="flex justify-between items-center mt-4">
-      <button
-        (click)="prevPage()"
-        [disabled]="currentPage === 1"
-        class="px-3 py-1 bg-gray-200 text-sm rounded disabled:opacity-50"
-      >
-        ← Previous
-      </button>
-      <span class="text-sm">Page {{ currentPage }} / {{ totalPages }}</span>
-      <button
-        (click)="nextPage()"
-        [disabled]="currentPage === totalPages"
-        class="px-3 py-1 bg-gray-200 text-sm rounded disabled:opacity-50"
-      >
-        Next →
-      </button>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-sm text-gray-600">
+        Page {{ currentPage }} sur {{ totalPages }}
+      </div>
+      <div class="flex gap-2">
+        <button
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Précédent
+        </button>
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Suivant
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>

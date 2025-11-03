@@ -12,23 +12,45 @@
 <!-- src/app/app.html -->
 <div class="min-h-screen bg-gray-50">
   <!-- Header -->
-  <header class="bg-white shadow">
+  <header class="bg-white shadow-sm border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-      <h1 class="text-xl font-bold text-gray-900">SpaceX Launch Dashboard</h1>
+      <!-- Logo et titre -->
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold text-gray-900">SpaceX Launch Dashboard</h1>
+      </div>
       
+      <!-- Section utilisateur -->
       <div class="flex items-center gap-4">
         <!-- Affiche le rôle de l'utilisateur -->
-        <div class="text-sm text-gray-600">
-          Connecté en tant que <span class="font-medium">{{ user()?.role === 'admin' ? 'Admin' : 'Utilisateur' }}</span>
+        <div *ngIf="user()" class="text-sm text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full">
+          Connecté en tant que 
+          <span class="font-medium" [ngClass]="{'text-blue-600': user()?.role === 'admin', 'text-gray-700': user()?.role !== 'admin'}">
+            {{ user()?.role === 'admin' ? 'Admin' : 'Utilisateur' }}
+          </span>
         </div>
 
-        <!-- Bouton Déconnexion -->
+        <!-- Bouton Déconnexion/Connexion -->
         <button 
+          *ngIf="user(); else loginButton"
           (click)="logout()" 
-          class="text-sm text-red-600 hover:text-red-800 hover:underline font-medium"
+          class="text-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow"
         >
           Déconnexion
         </button>
+        
+        <ng-template #loginButton>
+          <button 
+            (click)="navigateToLogin()" 
+            class="text-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow"
+          >
+            Accéder au login
+          </button>
+        </ng-template>
       </div>
     </div>
   </header>
