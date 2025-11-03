@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
-// IMPORTANT : Importer et enregistrer les composants Chart.js
+
 import {
   Chart,
   CategoryScale,

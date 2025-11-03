@@ -1,9 +1,8 @@
-// src/app/services/spacex.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Auth } from './auth'; // ← on va récupérer le token via AuthService
+import { Auth } from './auth'; // ← on va récupérer le token via le Service Auth
 import { DashboardData, Launch } from '../models/spacex.model';
 
 @Injectable({

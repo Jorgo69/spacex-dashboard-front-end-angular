@@ -1,5 +1,3 @@
-// src/app/models/spacex.model.ts
-
 export interface Rocket {
   id: string;
   name: string;

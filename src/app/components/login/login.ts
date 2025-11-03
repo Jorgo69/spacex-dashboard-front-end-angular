@@ -1,10 +1,9 @@
-// src/app/components/login/login.ts
 import { Component, OnInit } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { FormsModule } from '@angular/forms'; // ← Importe FormsModule ici
-import { CommonModule } from '@angular/common'; // ← Ajoute cette ligne
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; 
 
 @Component({
   selector: 'app-login',
@@ -34,7 +33,7 @@ export class Login implements OnInit{
       },
       error: () => {
         this.error = 'Identifiants invalides. Veuillez réessayer.';
-        console.error('❌ Échec de la connexion');
+        console.error(' Échec de la connexion');
       }
     });
   }

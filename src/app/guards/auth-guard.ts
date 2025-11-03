@@ -1,4 +1,3 @@
-// src/app/guards/auth.guard.ts
 import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
 import { Auth } from '../services/auth';
@@ -9,9 +8,9 @@ export const authGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (auth.isLoggedIn()) {
-    return true; // ✅ Accès autorisé
+    return true; // Accès autorisé
   } else {
-    // ❌ Redirige vers login
+    //  Redirige vers login
     router.navigate(['/login']);
     return false;
   }
